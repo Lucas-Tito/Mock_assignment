@@ -3,6 +3,7 @@ package org.example;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -19,8 +20,7 @@ public class ApiAccess {
             URL url = new URL("https://pokeapi.co/api/v2/pokemon/" + pokeToSearch);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-            if(connection.getResponseCode() != 200)
-                throw new RuntimeException("HTTP error code: " + connection.getResponseCode());
+            connectionHTTP(connection);
 
             BufferedReader response = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String reponseString = Util.bufferedReaderToString(response);
@@ -32,6 +32,11 @@ public class ApiAccess {
         }
     }
 
+    public RuntimeException connectionHTTP(HttpURLConnection connection) throws IOException {
+        if(connection.getResponseCode() != 200)
+            throw new RuntimeException("HTTP error code: " + connection.getResponseCode());
 
+        return null;
+    }
 
 }

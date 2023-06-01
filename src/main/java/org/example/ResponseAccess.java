@@ -10,7 +10,10 @@ public class ResponseAccess {
         this.apiAccess = apiAccess;
     }
     public String getPokemonName(int pokeId) throws Exception {
-        return apiAccess.searchPoke(pokeId);
+        if(pokeId >= 0) {
+            return apiAccess.searchPoke(pokeId);
+        }
+        throw new IllegalStateException("id invalido");
     }
 
 
