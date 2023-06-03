@@ -15,18 +15,19 @@ public class ApiAccess {
     * the pokemon to search is determined by a int that represents his id
     * from that the method returns only the name of the pokemon chosen
     * */
-    public String searchPoke(int pokeToSearch) throws Exception{
+    JsonNode node;
+    public JsonNode searchPoke() throws Exception{
         try{
-            URL url = new URL("https://pokeapi.co/api/v2/pokemon/" + pokeToSearch);
+            URL url = new URL("https://pokeapi.co/api/v2/pokemon/");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
             connectionHTTP(connection);
 
             BufferedReader response = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String reponseString = Util.bufferedReaderToString(response);
-            JsonNode node = Util.stringToJson(reponseString);
+            this.node = Util.stringToJson(reponseString);
 
-            return node.get("name").asText();
+            return node;
         }catch (Exception e){
             throw new Exception("Erro: " + e);
         }
@@ -39,4 +40,7 @@ public class ApiAccess {
         return null;
     }
 
+    public String namePokemon(int id){
+       return this.node.get("results").get(id).toString();
+    }
 }
