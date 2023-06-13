@@ -1,11 +1,14 @@
 package org.example;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.gson.Gson;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public class ApiAccess {
@@ -16,16 +19,20 @@ public class ApiAccess {
     * from that the method returns only the name of the pokemon chosen
     * */
     JsonNode node;
+    private PokeDeckModel pkm;
+
+    private PokemonModel pkmModel;
+    private URL url;
     public JsonNode searchPoke() throws Exception{
         try{
-            URL url = new URL("https://pokeapi.co/api/v2/pokemon/");
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-            connectionHTTP(connection);
+            //connectionHTTP(connection);
 
             BufferedReader response = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             String reponseString = Util.bufferedReaderToString(response);
             this.node = Util.stringToJson(reponseString);
+
 
             return node;
         }catch (Exception e){
@@ -33,14 +40,40 @@ public class ApiAccess {
         }
     }
 
-    public RuntimeException connectionHTTP(HttpURLConnection connection) throws IOException {
+    /*public RuntimeException connectionHTTP(HttpURLConnection connection) throws IOException {
         if(connection.getResponseCode() != 200)
             throw new RuntimeException("HTTP error code: " + connection.getResponseCode());
 
         return null;
-    }
+    }*/
 
     public String namePokemon(int id){
-       return this.node.get("results").get(id).toString();
+        return this.node.get("results").get(id).toString();
+    }
+
+    public void setRequest(String endpoint) throws Exception {
+        this.setUrl(new URL(endpoint));
+        this.searchPoke();
+    }
+    public String abrirPokeList() throws Exception {
+        this.setRequest("https://pokeapi.co/api/v2/pokemon/");
+        this.pkm = new Gson().fromJson(this.node.toString(),PokeDeckModel.class);
+
+        return this.pkm.pokemonListName();
+    }
+
+    public String getPokemonInfoByName(String pokeName) throws Exception {
+        System.out.println("\n----------------------------------------------------------- \n");
+        for (PokeDeckModel.Results pk : this.pkm.results) {
+            if(!pk.getName().equals(pokeName)) continue;
+            this.setRequest(pk.getUrl());
+            this.pkmModel = new Gson().fromJson(this.node.toString(), PokemonModel.class);
+            return this.pkmModel.toString();
+        }
+        return "Pokemon não econtrado";
+    }
+
+    public void setUrl(URL url) { // Setter para a URL
+        this.url = url;
     }
 }
