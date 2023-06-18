@@ -5,6 +5,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.mockito.Mockito.*;
 
+import java.io.BufferedReader;
 import java.net.HttpURLConnection;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,31 +17,31 @@ class ResponseAccessTest {
     ResponseAccess responseAccess = new ResponseAccess(apiAccess);
 
     @Test
-    public void responseAccessTest() throws Exception {
-        when(apiAccess.namePokemon(0)).thenReturn("bulbasaur");
-        assertEquals("bulbasaur", responseAccess.getPokemonName(0));
+    public void abrirPokeList() throws Exception {
+        when(apiAccess.abrirPokeList()).thenReturn("");
+        assertEquals("", responseAccess.abrirPokeList());
 
     }
     @Test
-    public void idNegative() throws Exception {
-        IllegalStateException exception = assertThrows(IllegalStateException.class, () -> responseAccess.getPokemonName(-1));
-        assertEquals("id invalido",exception.getMessage());
-
+   public void getPokemonInfoByNameTest() throws Exception {
+        when(apiAccess.getPokemonInfoByName("bulbasaur")).thenReturn("");
+        assertEquals("", responseAccess.getPokemonInfoByName("bulbasaur"));
     }
+
     @Test
     public void validArgument() throws Exception {
         ResponseAccess responseAccess1 = mock(ResponseAccess.class);
-        Mockito.when(responseAccess1.getPokemonName(1)).thenReturn("ivsaur");
+        Mockito.when(responseAccess1.getPokemonInfoByName("bulbasaur")).thenReturn("");
 
-        ArgumentCaptor<Integer> acInteger = ArgumentCaptor.forClass(Integer.class);
+        ArgumentCaptor<String> acString = ArgumentCaptor.forClass(String.class);
 
-        Mockito.doReturn(null).when(responseAccess1).getPokemonName(acInteger.capture());
-        responseAccess1.getPokemonName(1);
+        Mockito.doReturn(null).when(responseAccess1).getPokemonInfoByName(acString.capture());
+        responseAccess1.getPokemonInfoByName("bulbasaur");
 
-        Mockito.verify(responseAccess1,Mockito.times(1)).getPokemonName(Mockito.anyInt());
+        Mockito.verify(responseAccess1,Mockito.times(1)).getPokemonInfoByName(Mockito.anyString());
 
-        assertEquals(1,acInteger.getValue());
-
+        assertEquals("bulbasaur",acString.getValue());
 
     }
+
 }

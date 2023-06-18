@@ -9,12 +9,14 @@ public class ResponseAccess {
     public ResponseAccess(ApiAccess apiAccess){
         this.apiAccess = apiAccess;
     }
-    public String getPokemonName(int pokeId) throws Exception {
-        if(pokeId >= 0) {
-            String name = apiAccess.namePokemon(pokeId);
-            return name;
-        }
-        throw new IllegalStateException("id invalido");
+    public String abrirPokeList() throws Exception {
+        String listName = apiAccess.abrirPokeList();
+        return listName;
+    }
+
+    public String getPokemonInfoByName(String pokeName) throws Exception {
+        String pokeInfo = apiAccess.getPokemonInfoByName(pokeName);
+        return pokeInfo;
     }
 
 

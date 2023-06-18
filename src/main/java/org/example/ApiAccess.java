@@ -1,6 +1,10 @@
 package org.example;
 
+import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
@@ -10,6 +14,7 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 public class ApiAccess {
 
@@ -33,8 +38,11 @@ public class ApiAccess {
             String reponseString = Util.bufferedReaderToString(response);
             this.node = Util.stringToJson(reponseString);
 
+            response.close();
+            connection.disconnect();
 
             return node;
+
         }catch (Exception e){
             throw new Exception("Erro: " + e);
         }
@@ -47,20 +55,25 @@ public class ApiAccess {
         return null;
     }*/
 
-    public String namePokemon(int id){
-        return this.node.get("results").get(id).toString();
-    }
+
 
     public void setRequest(String endpoint) throws Exception {
         this.setUrl(new URL(endpoint));
         this.searchPoke();
     }
+
+
+
     public String abrirPokeList() throws Exception {
         this.setRequest("https://pokeapi.co/api/v2/pokemon/");
         this.pkm = new Gson().fromJson(this.node.toString(),PokeDeckModel.class);
+        System.out.println(this.node.toString());
 
         return this.pkm.pokemonListName();
     }
+
+
+
 
     public String getPokemonInfoByName(String pokeName) throws Exception {
         System.out.println("\n----------------------------------------------------------- \n");
@@ -68,6 +81,7 @@ public class ApiAccess {
             if(!pk.getName().equals(pokeName)) continue;
             this.setRequest(pk.getUrl());
             this.pkmModel = new Gson().fromJson(this.node.toString(), PokemonModel.class);
+            System.out.println(this.node.toString());
             return this.pkmModel.toString();
         }
         return "Pokemon não econtrado";
